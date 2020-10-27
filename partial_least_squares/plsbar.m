@@ -1,11 +1,11 @@
-function plsbar(result, compnum, flipval, behdesc, sv)
+function plsbar(result, LVnum, flipval, behdesc)
 % PLSBAR Creates bar graphs for PLS-derived latent variables.
 
 figure;
-bardata = result.lvcorrs(:,compnum)*flipval;
-upper = result.boot_result.ulcorr(:,compnum)- result.lvcorrs(:,compnum);
+bardata = result.lvcorrs(:,LVnum)*flipval;
+upper = result.boot_result.ulcorr(:,LVnum)- result.lvcorrs(:,LVnum);
 upper = upper*flipval;
-lower = result.lvcorrs(:,compnum) - result.boot_result.llcorr(:,compnum);
+lower = result.lvcorrs(:,LVnum) - result.boot_result.llcorr(:,LVnum);
 lower = lower*flipval;
 
 b = barh(bardata); hold on
@@ -38,7 +38,10 @@ set(gca,'TickLabelInterpreter','none', ...
     'FontName', 'Century Schoolbook', ...
     'Box', 'off');
 set(gcf, 'color', 'w')
-if sv == 1
-    saveas(gcf, fullfile('pls', ['LV' num2str(compnum) '_CognitionSaliences.fig']))
-    saveas(gcf, fullfile('pls', ['LV' num2str(compnum) '_CognitionSaliences.png']))
+if flipval == 1
+    saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_BehaviouralLoadings.fig']))
+    saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_BehaviouralLoadings.png']))
+else
+    saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_BehaviouralLoadings_flipped.fig']))
+    saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_BehaviouralLoadings_flipped.png']))
 end

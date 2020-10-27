@@ -96,17 +96,9 @@ writetable(T, fullfile('pls', 'BehaviouralLoadings.csv'))
 writetable(Tf, fullfile('pls', 'flipped', 'BehaviouralLoadings_flipped.csv'))
 % Boot Ratios
 
-Tb = table([1:size(info.abbreviation,1)]', info.abbreviation, info.description,'VariableNames', {'ROI', 'ROIabbreviation', 'ROIdescription'});
-Tbf = table([1:size(info.abbreviation,1)]', info.abbreviation, info.description,'VariableNames', {'ROI', 'ROIabbreviation', 'ROIdescription'});
-for k = 1:size(LVs,2)
-    tb = table(p.result.boot_result.compare_u(:,k), 'VariableNames', {['LV' num2str(k)]});
-    Tb = [Tb tb];
-    % flipped
-    tbf = table(p.result.boot_result.compare_u(:,k)*-1, 'VariableNames', {['LV' num2str(k)]});
-    Tbf = [Tbf tbf];
-end
-writetable(Tb, fullfile('pls', 'BootRatios.csv'))
-writetable(Tbf, fullfile('pls', 'flipped', 'BootRatios_flipped.csv'))
+Tb = table([1:size(info.abbreviation,1)]', info.abbreviation, info.description,'VariableNames', {'ROI', 'ROIabbreviation', 'ROIdescription']});
+writetable(T, ['LV_bootratios.csv']);
+
 
 % Extract LVs
 for i = 1:size(p.pct_cov,1)
