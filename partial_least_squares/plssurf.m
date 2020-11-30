@@ -1,45 +1,63 @@
-function plssurf(info, avsurf, result, LVnum, flipval)
+function plssurf(info, avsurf, result, LVnum, flipval, thresh, figlabel)
 % PLSSURF Creates cortical surface figures for PLS-derived latent variables.
 
 X = result.boot_result.compare_u(:,LVnum)*flipval;
 
-if size(result.u,1)>1000
-    output = X;
+if isfield(info, 'metrics')
+    metrics = size(info.metrics,1);
 else
-    atlas = info.ROIverts';
-    rois = info.label_number;
-    output = roi2data(X,atlas, rois);
+    metrics = 1;
 end
-% Bootstrap Ratios
-figure;
-SurfStatView(output, avsurf, 'Bootstrap Ratios');
-if flipval == 1
-    saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_BootRatios.fig']))
-    saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_BootRatios.png']))
-else
-    saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_BootRatios_flipped.fig']))
-    saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_BootRatios_flipped.png']))
-end
-%colormap
-thresh = [1.96, 2.58]; % 0.05, 0.01
-valrng = linspace(min(output),max(output),256);
-for j = 1:size(thresh,2)
-    bluelen = sum(valrng<=-thresh(j));
-    redlen = sum(valrng >= thresh(j));
-    graylen = sum(valrng > -thresh(j) & valrng < thresh(j));
-    blue = [zeros(bluelen,1),linspace(0,1,bluelen)', ones(bluelen,1)];
-    gray=ones(graylen,3)*0.8;
-    red = [ones(redlen,1), linspace(1,0,redlen)', zeros(redlen,1)];
-    cmap = [blue;gray;red];
+
+cols = size(result.boot_result.compare_u,1)/metrics;
+
+for i = 1:metrics    
+    if cols == 81924 % vertex
+        output = X;
+    else
+        tmp = X(1+((i-1)*cols):i*cols);
+        atlas = info.ROIverts';
+        rois = info.label_number;
+        output = roi2data(tmp,atlas, rois);
+    end
+    
+    if metrics > 1
+        figlabel2 = [figlabel ' ' info.metrics{i}];
+    else
+        figlabel2 = figlabel;
+    end
+    
     % Bootstrap Ratios
     figure;
-    SurfStatView(output, avsurf, 'Bootstrap Ratios');
-    colormap(cmap)
+    SurfStatView(output, avsurf, figlabel2);
     if flipval == 1
-        saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_' num2str(thresh(j)) '_BootRatios.fig']))
-        saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_' num2str(thresh(j)) '_BootRatios.png']))
+        saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) figlabel2 '.fig']))
+        saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) figlabel2 '.png']))
     else
-        saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_' num2str(thresh(j)) '_BootRatios_flipped.fig']))
-        saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_' num2str(thresh(j)) '_BootRatios_flipped.png']))
+        saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) figlabel2 '_flipped.fig']))
+        saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) figlabel2 '_flipped.png']))
+    end
+
+    %colormap
+    valrng = linspace(min(output),max(output),256);
+    for j = 1:size(thresh,2)
+        bluelen = sum(valrng<=-thresh(j));
+        redlen = sum(valrng >= thresh(j));
+        graylen = sum(valrng > -thresh(j) & valrng < thresh(j));
+        blue = [zeros(bluelen,1),linspace(0,1,bluelen)', ones(bluelen,1)];
+        gray=ones(graylen,3)*0.8;
+        red = [ones(redlen,1), linspace(1,0,redlen)', zeros(redlen,1)];
+        cmap = [blue;gray;red];
+        % Bootstrap Ratios
+        figure;
+        SurfStatView(output, avsurf, figlabel2);
+        colormap(cmap)
+        if flipval == 1
+            saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_' num2str(thresh(j)) figlabel2 '.fig']))
+            saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_' num2str(thresh(j)) figlabel2 '.png']))
+        else
+            saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_' num2str(thresh(j)) figlabel2 '_flipped.fig']))
+            saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_' num2str(thresh(j)) figlabel2 '_flipped.png']))
+        end
     end
 end

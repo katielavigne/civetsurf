@@ -30,7 +30,7 @@ function p = pls(X, info, avsurf, glimfile, behvars, behdesc)
 mkdir pls
 Y = zeros(size(X,1), size(behvars, 2));
 for j = 1 : size(behvars, 2)
-    varclass = class(glimfile.(behvars{j}));
+    try varclass = class(glimfile.(behvars{j})); catch warning([behvars{j} ' issue']); end
     switch varclass
         case 'cell'
             [numervar, id] = findgroups(glimfile.(behvars{j}));
@@ -94,10 +94,34 @@ for j = 1:size(LVs,2)
 end
 writetable(T, fullfile('pls', 'BehaviouralLoadings.csv'))
 writetable(Tf, fullfile('pls', 'flipped', 'BehaviouralLoadings_flipped.csv'))
-% Boot Ratios
 
-Tb = table([1:size(info.abbreviation,1)]', info.abbreviation, info.description,'VariableNames', {'ROI', 'ROIabbreviation', 'ROIdescription'});
-Tbf = table([1:size(info.abbreviation,1)]', info.abbreviation, info.description,'VariableNames', {'ROI', 'ROIabbreviation', 'ROIdescription'});
+% Boot Ratios
+if isfield(info, 'metrics')
+    metrics = size(info.metrics,1);
+else
+    metrics = 1;
+end
+
+tboot = {};
+n = 1;
+for i = 1:metrics
+    if metrics == 1
+        metric = '';
+    else
+        metric = info.metrics{i};
+    end
+    for j = 1:size(info.abbreviation, 1)
+        tboot{n,1} = n;
+        tboot{n,2} = info.abbreviation{j};
+        tboot{n,3} = info.description{j};
+        tboot{n,4} = metric;
+        n = n + 1;
+    end
+end
+tboot = cell2table(tboot, 'VariableNames', {'ROI', 'ROIabbreviation', 'ROIdescription', 'Metric'});
+Tb = tboot;
+Tbf = tboot;
+
 for k = 1:size(LVs,2)
     tb = table(p.result.boot_result.compare_u(:,k), 'VariableNames', {['LV' num2str(k)]});
     Tb = [Tb tb];
@@ -113,10 +137,10 @@ for i = 1:size(p.pct_cov,1)
     if p.result.perm_result.sprob(i) <= 0.05
         flipval = 1;
         plsbar(p.result, i, flipval, behdesc) % behavioural data
-        plssurf(info, avsurf, p.result, i, flipval) % brain data
+        plssurf(info, avsurf, p.result, i, flipval, [1.96, 2.58], 'BootstrapRatios') % brain data
         % flipped
         flipval = -1;
         plsbar(p.result, i, flipval, behdesc) % behavioural data
-        plssurf(info, avsurf, p.result, i, flipval) % brain data
+        plssurf(info, avsurf, p.result, i, flipval, [1.96, 2.58], 'BootstrapRatios') % brain data
     end
 end

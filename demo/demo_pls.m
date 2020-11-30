@@ -45,23 +45,25 @@ behvars = {'zVerbMem', 'zVisMem', 'zWorkMem', 'zProcSpeed', 'zExecFunc', 'zAtt',
 behdesc = {'Verbal Memory', 'Visual Memory', 'Working Memory', 'Processing Speed', 'Executive Function', 'Attention', 'Gender', 'Age', 'Years_of_Education', 'Battery', 'SAPS_Total', 'SANS_Total', 'Antipsychotic use', 'mean CT'};
 
 PLS = pls(data.resid, data.parc.pinfo, data.avsurf, data.glimfile, behvars, behdesc); % run pls
-save civetsurf_pls.mat % save results output
+save(fullfile('pls', 'civetsurf_pls.mat')) % save results output
+close all
 
-%% RLS Replication
-% Apply previous PLS moel to new dataset.
+%% PLS Replication
+% Apply previous PLS model to new dataset.
 
 help plsrepl % view instructions for this step
 
-load civetsurf_results_pls.mat % load previous pls results
+load civetsurf_pls.mat % load previous pls results
 prevPLS = PLS;
 clear PLS
-newdata = dataprep; % create new data structure
+newdata = dataprep(); % create new data structure
 
 % OPTIONAL (should be same processing as previous pls analysis)
 [newdata.parc] = parcellate(newdata.Y.smooth20mm, newdata.avsurf, newdata.mask, 'dkt', pwd); % parcellate
-[newdata.residmodel, newdata.resid] = ssregress(newdata.parc.ROIs, newdata.glimfile, covars); % regress out covariates
+covars = {'meanCorticalMeasure20mm'}; % define covariates using variables from data.gfields
+[newdata.residmodel, ~, ~, newdata.resid] = ssregress(newdata.parc.ROIs, newdata.glimfile, covars); % regress out covariates
 % OPTIONAL END
 
-mkdir PLSreplication
-PLSrepl = plsrepl(newdata, prevPLS, 'PLSreplication', behvars, behdesc); % run pls replication
-save civetsurf_results_pls-replication.mat % save results output
+PLSrepl = plsrepl(newdata, prevPLS, behvars, behdesc, 1); % run pls replication projecting to LV1
+save(fullfile('PLSreplication', 'civetsurf_plsrepl.mat')) % save results output
+close all

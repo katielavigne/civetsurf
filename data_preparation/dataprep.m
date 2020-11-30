@@ -12,7 +12,9 @@ function d = dataprep()
 % function input:   none
 % online input:     (1) select glimfile
 %                   (2) select filter variable(s) & input parameter(s) (optional)
-%                       e.g., .Patient for Group, ~=0 for SurfaceQC
+%                       e.g., .Patient for Group, ~=0 for SurfaceQC, isnan
+%                       to exclude missing numeric data, isempty to exclude
+%                       missing string data
 %                   (3) select surface metric (e.g., cortical thickness)
 %                   (4) select data directory with CIVET output text files
 %
