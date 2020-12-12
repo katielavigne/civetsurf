@@ -23,8 +23,8 @@ save civetsurf_parc.mat data % save output
 help addSCvars % view instructions for this step
 
 data.gfields % list possible variables to add
-vars = {'zVerbMem', 'zVisMem'}; % define variables to add using variable names from data.gfields
-data.SCdata = addSCvars(data.parc.ROIs, data.glimfile, vars); % add variables to parcellated data
+vars = {'zVerbMem'; 'zVisMem'}; % define variables to add using variable names from data.gfields
+data.parc = addglimvars(data.parc, data.glimfile, vars, 'Hippo'); % add variables to parcellated data (output will be in data.parc.ROIs_Hippo in this example)
 
 %% Regress Out Covariates (optional)
 % Regress covariates out of data.
@@ -33,7 +33,7 @@ help ssregress % view instructions for this step
 
 data.gfields % list possible covariates
 covars = {'meanCorticalMeasure20mm'}; % define covariates using variables from data.gfields
-[data.residmodel, data.X, data.coef, data.resid] = ssregress(data.SCdata, data.glimfile, covars); % regress out covariates
+[data.residmodel, data.X, data.coef, data.resid] = ssregress(data.parc.ROIs_Hippo, data.glimfile, covars); % regress out covariates
 save civetsurf_resid.mat data % save output
 
 %% Structural Covariance

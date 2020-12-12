@@ -50,7 +50,7 @@ load('CIVETmask.mat', 'mask');
 d.mask = mask;
 
 % Load data matching glimfile
-measures = {'cortical thickness','surface area', 'volume', 'curvature'}; %, 'qT1', 'contrast'};
+measures = {'cortical thickness','surface area', 'volume', 'curvature', 'qT1'}; %, 'contrast'};
 [Selection, OK] = listdlg('PromptString', 'Select surface measure:', 'ListString', measures, 'SelectionMode', 'single');
 if OK == 1
     d.measure = measures{Selection};

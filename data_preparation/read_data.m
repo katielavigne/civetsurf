@@ -32,9 +32,9 @@ for k = 1:size(mms,1)
             case 'curvature' % S01_native_mc_rsl_0mm_gray_left.txt, S01_native_mc_rsl_0mm_mid_left.txt, S01_native_mc_rsl_0mm_white_left.txt
                 left = dir(fullfile(datadir, ['*' subjID '*_' mm '*gray*left*.txt']));
                 right = dir(fullfile(datadir, ['*' subjID '*_' mm '*gray*right*.txt']));
-            %case 'qT1' % TO DO
-            %    left = dir(fullfile(datadir, ['*' subjID '*_' mm '*left*.txt']));
-            %    right = dir(fullfile(datadir, ['*' subjID '*_' mm '*right*.txt']));
+            case 'qT1' %S01_qT1mean_left_20mm.txt, S01_qT1mean_right_20mm.txt
+               left = dir(fullfile(datadir, ['*' subjID '*left*' mm '*.txt']));
+               right = dir(fullfile(datadir, ['*' subjID '*right*' mm '*.txt']));
             %case 'contrast' % TO DO
             %    left = dir(fullfile(datadir, ['*' subjID '*_' mm '*left*.txt']));
             %    right = dir(fullfile(datadir, ['*' subjID '*_' mm '*right*.txt']));
