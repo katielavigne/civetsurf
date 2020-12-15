@@ -51,6 +51,10 @@ for k = 1:size(mms,1)
         end
     end
     Y.(['smooth' mm]) = SurfStatReadData([filesleft filesright]);
+    if length(class(Y.(['smooth' mm]))) == 10
+        load CIVETmask.mat
+        Y.(['smooth' mm]) = Y.(['smooth' mm]).Data(1).Data(1:size(mask,2),:)'; % memory mapping
+    end
 end
 
 % Remove missing subjects from glimfile
