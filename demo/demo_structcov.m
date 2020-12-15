@@ -50,7 +50,7 @@ save(fullfile(pwd, 'structcov', 'civetsurf_results_structcov.mat')) % save resul
 
 help jackknife_bias_est % view instructions for this step
 
-[W] = jackknife_bias_est(sc); % run analysis
+W = jackknife_bias_est(sc); % run analysis
 save(fullfile(pwd, 'structcov', 'civetsurf_results_jackknife.mat'))
 %% Graph Theory
 % Generate graph theoretical measures.
