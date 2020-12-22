@@ -25,6 +25,7 @@ if isfield(sc, 'groups')
             else
                 normW(:,:,grsubj+size(sc.groups(1).data,1)) = tmp./max(tmp(:));
             end
+            normW(1:size(normW,1)+1:end) = 1;
         end
     end
 else
@@ -36,5 +37,6 @@ else
         W = corrmtrix-corrLOO;
         tmp = W - min(W(:));
         normW(:,:,subj) = tmp./max(tmp(:));
+        normW(1:size(normW,1)+1:end) = 1;
     end
 end

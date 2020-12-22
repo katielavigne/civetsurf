@@ -91,7 +91,7 @@ if ~isempty(Group)
             for j = 1:length(comp.fdr)
                 for k = j+1:length(comp.fdr)
                     if comp.fdr(j,k,:) == 1
-                        fprintf(fid, [d.parc.pinfo.description{j} ' - ' d.parc.pinfo.description{k} '\t' num2str(comp.DP(j,k)) '\t' num2str(comp.P(j,k)) '\n']);
+                        fprintf(fid, [d.parc.pinfo.description{j} ' - ' d.parc.pinfo.description{k} '\t' num2str(comp.ZP(j,k)) '\t' num2str(comp.P(j,k)) '\n']);
                     end
                 end
             end

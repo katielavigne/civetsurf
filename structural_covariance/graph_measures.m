@@ -22,7 +22,6 @@ function gr = graph_measures(W, Ci)
 gr.W = W;
 nsubjs = size(W,3);
 nrois = size(W,1);
-[gr.global_strength, gr.global_efficiency] = deal(zeros(nsubjs,1));
 
 if exist('Ci', 'var')
     Ci = repelem(Ci,nsubjs,1);
@@ -31,13 +30,21 @@ end
 disp('Calculating graph measures...')
 for n = 1:nsubjs
     disp([num2str(n) '/' num2str(nsubjs) '...'])
-    % Autofix
+    % Autofix & Normalize
     W(:,:,n) = weight_conversion(W(:,:,n), 'autofix');
-
+    
     % Strength
     gr.strength(n,1:nrois) = strengths_und(W(:,:,n));
-    gr.global_strength(n) = mean(gr.strength(n,:));
-
+    
+    % Clustering Coefficient
+    Wnorm = weight_conversion(W(:,:,n), 'normalize'); % not necessary if jackknife, which is already normalized (but won't change matrix)
+    gr.clustcoef(n,1:nrois) = clustering_coef_wu(Wnorm);
+    
+    % Characteristic Path Length
+    L = weight_conversion(W(:,:,n), 'lengths');
+    D = distance_wei(L);
+    gr.charpath(n,1) = charpath(D);
+    
     % Modularity
     if ~exist('Ci', 'var')
         [gr.modularity_Ci(n,:),gr.modularity_Q(n,1)] = modularity_und(W(:,:,n));
@@ -48,13 +55,15 @@ for n = 1:nsubjs
     gr.participation_coefficient(n,:) = participation_coef(W(:,:,n),gr.modularity_Ci(n,:));
     
     % Efficiency
-    gr.global_efficiency(n) = efficiency_wei(W(:,:,n));
+    gr.global_efficiency(n,1) = efficiency_wei(W(:,:,n));
 %     gr.local_efficiency(n,:) = efficiency_wei(W(:,:,n),2)'; % can take some time
     
-    % Betweenness Centrality %%% BROKEN!
-    Wsubj = W(:,:,n);
-    Wsubj(1:nrois+1:end) = 1;
-    invW = weight_conversion(Wsubj, 'lengths'); % must first convert weights to lengths
-    invW = weight_conversion(Wsubj, 'normalize');
-    gr.betweenness_centrality(n,:) = betweenness_wei(invW);
+    % Betweenness Centrality
+    gr.betweenness_centrality(n,:) = betweenness_wei(L);
+    gr.betweenness_centrality(n,:) = gr.betweenness_centrality(n,:)/[(nrois-1)*(nrois-2)];
 end
+
+gr.meanstrength = mean(gr.strength,2);
+gr.meanclustcoef = mean(gr.clustcoef,2);
+gr.meanPC = mean(gr.participation_coefficient,2);
+gr.meanBC = mean(gr.betweenness_centrality,2);
