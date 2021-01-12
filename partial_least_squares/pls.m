@@ -137,10 +137,10 @@ for i = 1:size(p.pct_cov,1)
     if p.result.perm_result.sprob(i) <= 0.05
         flipval = 1;
         plsbar(p.result, i, flipval, behdesc) % behavioural data
-        plssurf(info, avsurf, p.result, i, flipval, [1.96, 2.58], 'BootstrapRatios') % brain data
+        plssurf(info, avsurf, p.result, i, flipval, [1.96, 2.58], 'Bootstrap Ratios') % brain data
         % flipped
         flipval = -1;
         plsbar(p.result, i, flipval, behdesc) % behavioural data
-        plssurf(info, avsurf, p.result, i, flipval, [1.96, 2.58], 'BootstrapRatios') % brain data
+        plssurf(info, avsurf, p.result, i, flipval, [1.96, 2.58], 'Bootstrap Ratios') % brain data
     end
 end

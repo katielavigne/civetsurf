@@ -29,13 +29,16 @@ for i = 1:metrics
     
     % Bootstrap Ratios
     figure;
-    SurfStatView(output, avsurf, figlabel2);
+    [a, cb] = SurfStatView(output, avsurf, figlabel2);
+    cb.Limits = [round(cb.Limits(1)) round(cb.Limits(2))];
+    set(gca, 'FontSize', 14, 'FontName', 'Times')
+    
     if flipval == 1
-        saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) figlabel2 '.fig']))
-        saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) figlabel2 '.png']))
+        saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) strrep(figlabel2, ' ', '') '.fig']))
+        saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) strrep(figlabel2, ' ', '') '.png']))
     else
-        saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) figlabel2 '_flipped.fig']))
-        saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) figlabel2 '_flipped.png']))
+        saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) strrep(figlabel2, ' ', '') '_flipped.fig']))
+        saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) strrep(figlabel2, ' ', '') '_flipped.png']))
     end
 
     %colormap
@@ -50,14 +53,16 @@ for i = 1:metrics
         cmap = [blue;gray;red];
         % Bootstrap Ratios
         figure;
-        SurfStatView(output, avsurf, figlabel2);
+        [a, cb] = SurfStatView(output, avsurf, figlabel2);
         colormap(cmap)
+        cb.Limits = [round(cb.Limits(1)) round(cb.Limits(2))];
+        set(gca, 'FontSize', 14, 'FontName', 'Times')
         if flipval == 1
-            saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_' num2str(thresh(j)) figlabel2 '.fig']))
-            saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_' num2str(thresh(j)) figlabel2 '.png']))
+            saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_' num2str(thresh(j)) strrep(figlabel2, ' ', '') '.fig']))
+            saveas(gcf, fullfile('pls', ['LV' num2str(LVnum) '_' num2str(thresh(j)) strrep(figlabel2, ' ', '') '.png']))
         else
-            saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_' num2str(thresh(j)) figlabel2 '_flipped.fig']))
-            saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_' num2str(thresh(j)) figlabel2 '_flipped.png']))
+            saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_' num2str(thresh(j)) strrep(figlabel2, ' ', '') '_flipped.fig']))
+            saveas(gcf, fullfile('pls', 'flipped', ['LV' num2str(LVnum) '_' num2str(thresh(j)) strrep(figlabel2, ' ', '') '_flipped.png']))
         end
     end
 end
