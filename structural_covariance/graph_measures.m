@@ -51,7 +51,7 @@ for n = 1:nsubjs
     else
         gr.modularity_Ci = Ci;
     end
-    gr.modularity_Z(n,:) = module_degree_zscore(W(:,:,n),gr.modularity_Ci(n,:))';
+    gr.modularity_Z(n,:) = module_degree_zscore(W(:,:,n),gr.modularity_Ci(n,:)');
     gr.participation_coefficient(n,:) = participation_coef(W(:,:,n),gr.modularity_Ci(n,:));
     
     % Efficiency

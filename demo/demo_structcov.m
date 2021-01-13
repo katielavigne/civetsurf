@@ -42,7 +42,7 @@ save civetsurf_resid.mat data % save output
 help structcov % view instructions for this step
 
 mkdir structcov % create output directory
-sc = structcov(data.resid, data, 'Group', fullfile(pwd,'structcov')); % run analysis
+sc = structcov(data.resid, data, 'group', fullfile(pwd,'structcov')); % run analysis
 save(fullfile(pwd, 'structcov', 'civetsurf_results_structcov.mat')) % save results output
 
 %% Jackknife bias estimation
