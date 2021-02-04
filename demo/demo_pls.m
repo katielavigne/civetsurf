@@ -9,7 +9,7 @@ help dataprep % view instructions for this step
 data = dataprep(); % create data structure
 save civetsurf_data.mat % save output
 
-%% Parcellation (optional)
+%% Parcellation (optional, order with other optional sections varies by study)
 % Create parcellation for vertex data.
 
 help parcellate % view instructions for this step
@@ -17,22 +17,22 @@ help parcellate % view instructions for this step
 [data.parc] = parcellate(data.Y.smooth20mm, data.avsurf, data.mask, 'dkt', pwd); % parcellate
 save civetsurf_parc.mat data % save output
 
-%% Add Variables (optional)
+%% Add Variables (optional, order with other optional sections varies by study)
 % Append variables to data matrix.
 
-help addSCvars % view instructions for this step
+help addglimvars % view instructions for this step
 
 data.gfields % list possible variables to add
 vars = {'zVerbMem', 'zVisMem'}; % define variables to add using variable names from data.gfields
-data.SCdata = addSCvars(data.parc.ROIs, data.glimfile, vars); % add variables to parcellated data
+data.SCdata = addglimvars(data.parc, data.glimfile, vars, 'Hippo'); % add variables to parcellated data
 
-%% Regress Out Covariates (optional)
+%% Regress Out Covariates (optional, order with other optional sections varies by study)
 % Regress covariates out of data.
 
 help ssregress % view instructions for this step
 
 covars = {'meanCorticalMeasure20mm'}; % define covariates using variables from data.gfields
-[data.residmodel, ~, ~, data.resid] = ssregress(data.parc.ROIs, data.glimfile, covars); % regress out covariates
+[data.residmodel, ~, ~, data.resid] = ssregress(data.SCvars, data.glimfile, covars); % regress out covariates
 save civetsurf_resid.mat data % save output
 
 %% Partial Least Squares
