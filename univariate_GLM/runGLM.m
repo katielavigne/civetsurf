@@ -129,7 +129,7 @@ if strcmp(u.interaction, 'yes')
 
         if all(strcmp(u.INT(r).types,'continuous'))
             u.INT(r).contrasts(1).name = [predname{pairs(r,1)} '*' predname{pairs(r,2)}];
-            u.INT(r).contrasts(1).value = d.glimfile.(predname{pairs(r,1)}).*glimfile.(predname{pairs(r,2)});
+            u.INT(r).contrasts(1).value = d.glimfile.(predname{pairs(r,1)}).*d.glimfile.(predname{pairs(r,2)});
             preds = [u.INT(r).predictors{1} 'X' u.INT(r).predictors{2}];
             u.INT(r).contrasts(1).results = contrasts(u, u.INT(r).contrasts(1), 'INT', preds);
         elseif any(strcmp(u.INT(r).types, 'continuous'))

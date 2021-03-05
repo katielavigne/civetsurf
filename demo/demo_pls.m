@@ -23,8 +23,8 @@ save civetsurf_parc.mat data % save output
 help addglimvars % view instructions for this step
 
 data.gfields % list possible variables to add
-vars = {'zVerbMem', 'zVisMem'}; % define variables to add using variable names from data.gfields
-data.SCdata = addglimvars(data.parc, data.glimfile, vars, 'Hippo'); % add variables to parcellated data
+vars = {'zVerbMem'; 'zVisMem'}; % define variables to add using variable names from data.gfields
+data = addglimvars(data.parc.ROIs, data.parc.pinfo, data.glimfile, vars, 'Hippo'); % add variables to parcellated data
 
 %% Regress Out Covariates (optional, order with other optional sections varies by study)
 % Regress covariates out of data.
@@ -32,7 +32,7 @@ data.SCdata = addglimvars(data.parc, data.glimfile, vars, 'Hippo'); % add variab
 help ssregress % view instructions for this step
 
 covars = {'meanCorticalMeasure20mm'}; % define covariates using variables from data.gfields
-[data.residmodel, ~, ~, data.resid] = ssregress(data.SCvars, data.glimfile, covars); % regress out covariates
+[data.residmodel, ~, ~, data.resid] = ssregress(data.ROIs_Hippo, data.glimfile, covars); % regress out covariates
 save civetsurf_resid.mat data % save output
 
 %% Partial Least Squares

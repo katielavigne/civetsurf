@@ -67,6 +67,8 @@ yfields = numel(fieldnames(d.Y));
 yfieldnames = fieldnames(d.Y);
 for i = 1:yfields
     d.glimfile.(['meanCorticalMeasure' yfieldnames{i}(7:end)]) = mean(double(d.Y.(yfieldnames{i})(:,d.mask)),2);
+    d.glimfile.(['meanCorticalMeasureL' yfieldnames{i}(7:end)]) = mean(double(d.Y.(yfieldnames{i})(:,d.mask(1:40962))),2);
+    d.glimfile.(['meanCorticalMeasureR' yfieldnames{i}(7:end)]) = mean(double(d.Y.(yfieldnames{i})(:,d.mask(40963:end))),2);
     d.gfields = fieldnames(d.glimfile);    
 end
 
@@ -75,5 +77,7 @@ yfields = numel(fieldnames(d.Y));
 yfieldnames = fieldnames(d.Y);
 for i = 1:yfields
     d.glimfile.(['totalCorticalMeasure' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask)),2);
+    d.glimfile.(['meanCorticalMeasureL' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask(1:40962))),2);
+    d.glimfile.(['meanCorticalMeasureR' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask(40963:end))),2);
     d.gfields = fieldnames(d.glimfile);    
 end
