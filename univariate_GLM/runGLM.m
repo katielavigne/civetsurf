@@ -50,13 +50,13 @@ if size(predvars,2) > 1
 end
 
 % Define Model
-u.M = 1;
+M = 1;
 u.model = 'M=1';
 
 % Predictor(s)
 for k = 1:size(predvars,2)
     predname{k} = d.gfields{predvars(k)};
-    u.M = u.M + term(d.glimfile.(predname{k}));
+    M = M + term(d.glimfile.(predname{k}));
     u.model = [u.model '+' predname{k}];
 end
 
@@ -65,23 +65,23 @@ end
 if strcmp(u.interaction, 'yes')
     pairs = nchoosek(1:size(predvars,2), 2);
     for n = 1:size(pairs, 1)
-        u.M = u.M + term(d.glimfile.(predname{pairs(n,1)}))*term(d.glimfile.(predname{pairs(n,2)}));
+        M = M + term(d.glimfile.(predname{pairs(n,1)}))*term(d.glimfile.(predname{pairs(n,2)}));
         u.model = [u.model '+' predname{pairs(n,1)} '*' predname{pairs(n,2)}];
     end
-    ints = n;
+    ints =n;
 end
 
 % Covariate(s)
 for m = 1:size(covars,2)
     covname{m} = d.gfields{covars(m)};
     ctermname{m} = regexprep(covname{m}, '(?<=(^| ))(.)', '${upper($1)}');
-    u.M = u.M + term(d.glimfile.(covname{m}));
+    M = M + term(d.glimfile.(covname{m}));
     u.model = [u.model '+' ctermname{m}];
 end
 
 % Random term & identity matrix    
 if strcmp(u.modeltype, 'mixed')
-    u.M = u. + random(d.glimfile.(d.gfields{randvar(1)})) + I;
+    M = M + random(d.glimfile.(d.gfields{randvar(1)})) + I;
     u.model = [u.model '+random(' d.gfields{randvar(1)} ')+I'];
 end
 
@@ -90,7 +90,7 @@ mkdir(fullfile(u.outdir))
 fprintf(['\tModel: ' u.model '\n'])
 
 % Fit Model to Thickness Data
-u.slm = SurfStatLinMod(Y,u.M,u.avsurf);
+u.slm = SurfStatLinMod(Y,M,u.avsurf);
 
 % Define and run contrasts
 for n = 1:size(predvars,2)
