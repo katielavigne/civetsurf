@@ -4,13 +4,13 @@ function results = contrasts(uniGLM, contrast, ctype, predname)
 cname = strrep(contrast.name,'*', 'X');
 % Run analysis
 results.slm = SurfStatT(uniGLM.slm,contrast.value); % t-statistics
-try % RFT threshold (change P value if error!)
+try % RFT threshold (change P value if error!) % TO DO - output cluster-defining threshold used!
     [results.RFT.pval,results.RFT.peak,results.RFT.clus,results.RFT.clusid]=SurfStatP(results.slm,uniGLM.mask,0.005);
 catch
     try
         [results.RFT.pval,results.RFT.peak,results.RFT.clus,results.RFT.clusid]=SurfStatP(results.slm,uniGLM.mask,0.001);
     catch
-        [results.RFT.pval,results.RFT.peak,results.RFT.clus,results.RFT.clusid]=SurfStatP(results.slm,uniGLM.mask,0.005);
+        [results.RFT.pval,results.RFT.peak,results.RFT.clus,results.RFT.clusid]=SurfStatP(results.slm,uniGLM.mask,0.05);
     end
 end
 results.FDR.qval = SurfStatQ(results.slm, uniGLM.mask); % FDR threshold
