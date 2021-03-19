@@ -112,7 +112,7 @@ for n = 1:size(predvars,2)
         % Positive contrast
         u.ME(n).contrasts(1).name = ['+' predname{n}];
         u.ME(n).contrasts(1).value = d.glimfile.(predname{n});
-        u.ME(n).results = contrasts(u, u.ME(n).contrasts(1), 'ME', u.ME(n).predictor);
+        u.ME(n).contrasts(1).results = contrasts(u, u.ME(n).contrasts(1), 'ME', u.ME(n).predictor);
         % Negative contrast
         u.ME(n).contrasts(2).name = ['-' predname{n}];
         u.ME(n).contrasts(2).value = -d.glimfile.(predname{n});
