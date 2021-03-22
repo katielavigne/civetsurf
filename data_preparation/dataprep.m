@@ -62,6 +62,8 @@ end
 % Smooth
 d.Y = smooth_data(d.Y, d.avsurf, d.mask, 10); % Equal to 20mm
 
+[~,n] = size(d.glimfile);
+
 % Mean Cortical Measure
 yfields = numel(fieldnames(d.Y));
 yfieldnames = fieldnames(d.Y);
@@ -77,7 +79,10 @@ yfields = numel(fieldnames(d.Y));
 yfieldnames = fieldnames(d.Y);
 for i = 1:yfields
     d.glimfile.(['totalCorticalMeasure' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask)),2);
-    d.glimfile.(['meanCorticalMeasureL' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask(1:40962))),2);
-    d.glimfile.(['meanCorticalMeasureR' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask(40963:end))),2);
+    d.glimfile.(['totalCorticalMeasureL' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask(1:40962))),2);
+    d.glimfile.(['totalCorticalMeasureR' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask(40963:end))),2);
     d.gfields = fieldnames(d.glimfile);    
 end
+
+t = [d.glimfile(:,1),d.glimfile(:,n+1:end)];
+writetable(t,['Global ' d.measure ' measures.csv'])
