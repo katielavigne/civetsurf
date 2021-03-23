@@ -64,24 +64,20 @@ d.Y = smooth_data(d.Y, d.avsurf, d.mask, 10); % Equal to 20mm
 
 [~,n] = size(d.glimfile);
 
-% Mean Cortical Measure
+% Mean/Total Cortical Measure
 yfields = numel(fieldnames(d.Y));
 yfieldnames = fieldnames(d.Y);
 for i = 1:yfields
-    d.glimfile.(['meanCorticalMeasure' yfieldnames{i}(7:end)]) = mean(double(d.Y.(yfieldnames{i})(:,d.mask)),2);
-    d.glimfile.(['meanCorticalMeasureL' yfieldnames{i}(7:end)]) = mean(double(d.Y.(yfieldnames{i})(:,d.mask(1:40962))),2);
-    d.glimfile.(['meanCorticalMeasureR' yfieldnames{i}(7:end)]) = mean(double(d.Y.(yfieldnames{i})(:,d.mask(40963:end))),2);
-    d.gfields = fieldnames(d.glimfile);    
-end
-
-% Total Cortical Measure
-yfields = numel(fieldnames(d.Y));
-yfieldnames = fieldnames(d.Y);
-for i = 1:yfields
-    d.glimfile.(['totalCorticalMeasure' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask)),2);
-    d.glimfile.(['totalCorticalMeasureL' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask(1:40962))),2);
-    d.glimfile.(['totalCorticalMeasureR' yfieldnames{i}(7:end)]) = sum(double(d.Y.(yfieldnames{i})(:,d.mask(40963:end))),2);
-    d.gfields = fieldnames(d.glimfile);    
+    Y = d.Y.(yfieldnames{i});
+    YL = Y(:,1:40962);
+    YR = Y(:,40963:end);
+    d.glimfile.(['meanCorticalMeasure' yfieldnames{i}(7:end)]) = mean(double(Y(:,d.mask)),2); % mean
+    d.glimfile.(['meanCorticalMeasure' yfieldnames{i}(7:end) '_L']) = mean(double(YL(:,d.mask(1:40962))),2); % mean left
+    d.glimfile.(['meanCorticalMeasure' yfieldnames{i}(7:end) '_R']) = mean(double(YR(:,d.mask(40963:end))),2); % mean right
+    d.glimfile.(['totalCorticalMeasure' yfieldnames{i}(7:end)]) = sum(double(Y(:,d.mask)),2); % total
+    d.glimfile.(['totalCorticalMeasure' yfieldnames{i}(7:end) '_L']) = sum(double(YL(:,d.mask(1:40962))),2); % total left
+    d.glimfile.(['totalCorticalMeasure' yfieldnames{i}(7:end) '_R']) = sum(double(YR(:,d.mask(40963:end))),2); % total right
+    d.gfields = fieldnames(d.glimfile);
 end
 
 t = [d.glimfile(:,1),d.glimfile(:,n+1:end)];
