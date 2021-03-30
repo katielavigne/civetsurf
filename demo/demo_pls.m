@@ -23,7 +23,7 @@ save civetsurf_parc.mat data % save output
 help addglimvars % view instructions for this step
 
 data.gfields % list possible variables to add
-vars = {'zVerbMem'; 'zVisMem'}; % define variables to add using variable names from data.gfields
+vars = {'var1'; 'var2'}; % define variables to add using variable names from data.gfields
 data = addglimvars(data.parc.ROIs, data.parc.pinfo, data.glimfile, vars, 'Hippo'); % add variables to parcellated data
 
 %% Regress Out Covariates (optional, order with other optional sections varies by study)
@@ -41,8 +41,8 @@ save civetsurf_resid.mat data % save output
 help pls % view instructions for this step
 
 % Define behavioural variables (behvars) and descriptions for plotting (behdesc) using variable names from data.gfields
-behvars = {'zVerbMem', 'zVisMem', 'zWorkMem', 'zProcSpeed', 'zExecFunc', 'zAtt', 'Gender', 'Age', 'Years_of_Education', 'Battery', 'SAPS_Total', 'SANS_Total', 'Antipsychotic_yn', 'meanCorticalMeasure20mm'};
-behdesc = {'Verbal Memory', 'Visual Memory', 'Working Memory', 'Processing Speed', 'Executive Function', 'Attention', 'Gender', 'Age', 'Years_of_Education', 'Battery', 'SAPS_Total', 'SANS_Total', 'Antipsychotic use', 'mean CT'};
+behvars = {'var1', 'var2' 'var3', 'var4'};
+behdesc = {'var1name', 'var2name', 'var3name', 'var4name'};
 
 PLS = pls(data.resid, data.parc.pinfo, data.avsurf, data.glimfile, behvars, behdesc); % run pls
 save(fullfile('pls', 'civetsurf_pls.mat')) % save results output

@@ -12,17 +12,19 @@ parc.pinfo.abbreviation = [parc.pinfo.abbreviation; vars];
 parc.pinfo.description = [parc.pinfo.description; vars];
 parc.pinfo.name = [parc.pinfo.name '_' name];
 
+type = class(subjs);
+switch type
+    case 'double'
+        subjs = cellstr(num2str(subjs));
+end
 
+Y2 = zeros(size(Y1,1),size(vars,1));
 for s = 1:size(Y1,1)
-    leftfile = dir(fullfile(txtdir, ['*' subjs{s} '*left*.txt']));
-    fid = fopen(fullfile(txtdir, leftfile.name));
-    leftdata = textscan(fid, '%f');
+    files = dir(fullfile(txtdir, ['*' subjs{s} '*.txt']));
+    fid = fopen(fullfile(txtdir, files.name));
+    data = textscan(fid, '%f');
     fclose(fid);
-    rightfile = dir(fullfile(txtdir, ['*' subjs{s} '*right*.txt']));
-    fid = fopen(fullfile(txtdir, rightfile.name));
-    rightdata = textscan(fid, '%f');
-    fclose(fid);
-    Y2(s,:) = [leftdata{1}' rightdata{1}'];
+    Y2(s,:) = data{1}';
 end
 
 parc.(['ROIs_' name]) = [Y1 Y2];
