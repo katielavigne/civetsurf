@@ -67,7 +67,7 @@ p.result = pls_analysis(datamat, nsubjs, 1, option);
 % result.perm_result.sprob
 
 % Percent covariance / p values
-p.pct_cov = (p.result.s.^2)/sum(p.result.s.^2);
+p.pct_cov = ((p.result.s.^2)/sum(p.result.s.^2))*100;
 figure;
 scatter(p.result.perm_result.sprob, p.pct_cov(:,1), 'b', 'filled')
 set(gca,'FontSize',16)
