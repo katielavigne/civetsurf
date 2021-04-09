@@ -1,4 +1,4 @@
-function p = pls(X, info, avsurf, glimfile, behvars, behdesc)
+function p = pls(X, info, mask, avsurf, glimfile, behvars, behdesc)
 % PLS Runs behavioural PLS on dataprep'd data.
 %
 % description:      runs behavioural partial least squares analysis using
@@ -28,6 +28,14 @@ function p = pls(X, info, avsurf, glimfile, behvars, behdesc)
 % NOTE: PLS will fail if there are any missing data!
 
 mkdir pls
+p.type = '';
+
+%If vertex-wise, mask
+if size(X,2) == size(mask,2)
+    p.type = 'vertex';
+    X = X(:,mask);
+end
+
 Y = zeros(size(X,1), size(behvars, 2));
 for j = 1 : size(behvars, 2)
     try varclass = class(glimfile.(behvars{j})); catch warning([behvars{j} ' issue']); end
@@ -96,29 +104,33 @@ writetable(T, fullfile('pls', 'BehaviouralLoadings.csv'))
 writetable(Tf, fullfile('pls', 'flipped', 'BehaviouralLoadings_flipped.csv'))
 
 % Boot Ratios
-if isfield(info, 'metrics')
-    metrics = size(info.metrics,1);
-else
-    metrics = 1;
-end
-
 tboot = {};
 n = 1;
-for i = 1:metrics
-    if metrics == 1
-        metric = '';
-    else
-        metric = info.metrics{i};
+if strcmp(p.type, 'vertex')
+    tmpverts = info.ROIverts(mask);
+    for j = 1:size(X,2)
+        roi = tmpverts(j);
+        tboot{n,1} = n;
+        if roi == 0
+            [tboot{n,2},tboot{n,3}] = deal('');
+        else
+            tboot{n,2} = info.abbreviation{info.number == tmpverts(j)};
+            tboot{n,3} = info.description{info.number == tmpverts(j)};
+        end
+        n = n + 1;
     end
+elseif size(X,2) == size(info.abbreviation,1)
     for j = 1:size(info.abbreviation, 1)
         tboot{n,1} = n;
         tboot{n,2} = info.abbreviation{j};
         tboot{n,3} = info.description{j};
-        tboot{n,4} = metric;
         n = n + 1;
     end
+else
+    error('Multiple metrics have not yet been implemented.')
 end
-tboot = cell2table(tboot, 'VariableNames', {'ROI', 'ROIabbreviation', 'ROIdescription', 'Metric'});
+
+tboot = cell2table(tboot, 'VariableNames', {'BrainVariable', [info.name 'abbreviation'], [info.name 'description']});
 Tb = tboot;
 Tbf = tboot;
 
@@ -137,10 +149,10 @@ for i = 1:size(p.pct_cov,1)
     if p.result.perm_result.sprob(i) <= 0.05
         flipval = 1;
         plsbar(p.result, i, flipval, behdesc) % behavioural data
-        plssurf(info, avsurf, p.result, i, flipval, [1.96, 2.58], 'Bootstrap Ratios') % brain data
+        plssurf(info, mask, avsurf, p.result, i, flipval, [1.96, 2.58], 'Bootstrap Ratios') % brain data
         % flipped
         flipval = -1;
         plsbar(p.result, i, flipval, behdesc) % behavioural data
-        plssurf(info, avsurf, p.result, i, flipval, [1.96, 2.58], 'Bootstrap Ratios') % brain data
+        plssurf(info, mask, avsurf, p.result, i, flipval, [1.96, 2.58], 'Bootstrap Ratios') % brain data
     end
 end

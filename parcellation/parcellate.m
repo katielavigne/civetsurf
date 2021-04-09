@@ -15,6 +15,8 @@ function [p] = parcellate(d, avsurf, mask, pscheme, dir)
 %           .ROIverts:              identical to data.parc.pinfo.ROIverts
 %           .ROIs:                  parcellated surface data
 
+p.Ymask = Y(
+
 p.pscheme = upper(pscheme);
 load([p.pscheme 'info.mat'], 'info')
 p.pinfo = info;
