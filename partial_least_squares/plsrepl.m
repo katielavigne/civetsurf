@@ -30,8 +30,8 @@ tmp.lvcorrs = repdata.corr';
 mkdir(fullfile('pls', 'flipped'))
 flipval = 1;
 plsbar(tmp, 1, flipval, behdesc) % behavioural data
-plssurf(newdata.parc.pinfo, newdata.avsurf, tmp, 1, flipval, [.2, .5], 'Correlations') % brain data
+plssurf(newdata.parc.pinfo, newdata.mask, newdata.avsurf, tmp, 1, flipval, [.2, .5], 'Correlations') % brain data
 % flipped
 flipval = -1;
 plsbar(tmp, 1, flipval, behdesc) % behavioural data
-plssurf(newdata.parc.pinfo, newdata.avsurf, tmp, 1, flipval, [.2, .5], 'Correlations') % brain data
+plssurf(newdata.parc.pinfo, newdata.mask, newdata.avsurf, tmp, 1, flipval, [.2, .5], 'Correlations') % brain data
