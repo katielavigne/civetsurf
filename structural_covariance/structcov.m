@@ -27,10 +27,11 @@ end
 SC.data = data;
 SC.glimfile = d.glimfile;
 [SC.C, SC.P] = corrcoef(data);
-SC.C = SC.C.*double(SC.P<0.05);
-SC.C_fdr = SC.C.*double(fdr_bky(SC.P, 0.05));
-plotcovmatrix(SC.C, 'FullSample_Uncorrected', d.parc.pscheme, dir, d.parc.pinfo.abbreviation)
-plotcovmatrix(SC.C_fdr, 'FullSample_FDR', d.parc.pscheme, dir, d.parc.pinfo.abbreviation)
+SC.CP = SC.C.*double(SC.P<0.05);
+SC.C_fdr = SC.CP.*double(fdr_bky(SC.P, 0.05));
+plotcovmatrix(SC.C, 'FullSample', d.parc.pscheme, dir, d.parc.pinfo.abbreviation)
+plotcovmatrix(SC.CP, 'FullSample_Sig_Uncorrected', d.parc.pscheme, dir, d.parc.pinfo.abbreviation)
+plotcovmatrix(SC.C_fdr, 'FullSample_Sig_FDR', d.parc.pscheme, dir, d.parc.pinfo.abbreviation)
 make_bnv_files(d, SC.C_fdr, dir, 'BrainNet_FullSample_FDR')
 
 % Group Pairs

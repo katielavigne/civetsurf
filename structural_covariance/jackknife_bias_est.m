@@ -10,7 +10,8 @@ function [normW] = jackknife_bias_est(sc)
 %                               region x region x subjects array based on overall 
 %                               covariance matrix
 
-normW = zeros(size(sc.data,2),size(sc.data,2),size(sc.data,1));
+n = size(sc.data,1);
+normW = zeros(size(sc.data,2),size(sc.data,2),n);
 % if isfield(sc, 'groups')
 %     for gr = 1:size(sc.groups,2)
 %         corrmtrix = sc.groups(gr).C;
@@ -34,7 +35,8 @@ normW = zeros(size(sc.data,2),size(sc.data,2),size(sc.data,1));
         LOO = sc.data;
         LOO(subj,:) = [];
         corrLOO = corrcoef(LOO);
-        W = corrmtrix-corrLOO;
+        W = (n*corrmtrix)-((n-1)*corrLOO);
+        % Normalize between 0 and 1
         tmp = W - min(W(:));
         normW(:,:,subj) = tmp./max(tmp(:));
         normW(1:size(normW,1)+1:end) = 1;
