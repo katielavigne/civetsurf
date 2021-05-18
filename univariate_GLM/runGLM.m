@@ -81,7 +81,12 @@ end
 
 % Random term & identity matrix    
 if strcmp(u.modeltype, 'mixed')
-    M = M + random(d.glimfile.(d.gfields{randvar(1)})) + I;
+    idvar = d.glimfile.(d.gfields{randvar(1)});
+    if strcmp(class(idvar),'double')
+        idvar = cellstr(num2str(idvar));
+    end
+    randterm = term(idvar);
+    M = M + random(randterm) + I;
     u.model = [u.model '+random(' d.gfields{randvar(1)} ')+I'];
 end
 
