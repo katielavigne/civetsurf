@@ -28,7 +28,6 @@ function u = runGLM(d, Y, outdir)
 %   - Add MNI coordinates and DKT region names to table (testing/GLMtable_Int) &
 %   provide interaction plots (testing/Interaction_Plots.m)
 %   - Mean centre predictors for mixed models?
-%   - Two+ categorical predictor variables
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 u.avsurf = d.avsurf;
@@ -115,7 +114,7 @@ fprintf(['\tModel: ' u.model '\n'])
 % Fit Model to Thickness Data
 u.slm = SurfStatLinMod(Y,M,u.avsurf);
 
-% Define and run contrasts
+% Define contrasts
 % % Main effects
 for n = 1:size(predvars,2)
     u.ME(n).predictor = predname{n};
@@ -126,21 +125,36 @@ for n = 1:size(predvars,2)
         catpairs = nchoosek(1:size(u.ME(n).labels,1), 2);
         catpairs = [catpairs; flip(nchoosek(1:size(u.ME(n).labels,1),2),2)];
         for p = 1:size(catpairs,1)
-            cname = [u.ME(n).labels{catpairs(p,1)} '-' u.ME(n).labels{catpairs(p,2)}];
-            cvalue = termvar.(u.ME(n).labels{catpairs(p,1)})-termvar.(u.ME(n).labels{catpairs(p,2)});
-            u.ME(n).contrasts(p) = contrasts(u, cname, cvalue, 'ME', predname{n});
+            u.ME(n).cnames{p} = [u.ME(n).labels{catpairs(p,1)} '-' u.ME(n).labels{catpairs(p,2)}];
+            u.ME(n).cvalues{p} = termvar.(u.ME(n).labels{catpairs(p,1)})-termvar.(u.ME(n).labels{catpairs(p,2)});
         end
     else
         u.ME(n).type = 'continuous';
         u.ME(n).labels = {};
-        u.ME(n).contrasts(1) = contrasts(u, ['+' predname{n}], d.glimfile.(predname{n}), 'ME', predname{n}); % Positive contrast
-        u.ME(n).contrasts(2) = contrasts(u, ['-' predname{n}], -d.glimfile.(predname{n}), 'ME', predname{n}); % % Negative contrast
+        % Positive contrast
+        u.ME(n).cnames{1} = ['+' predname{n}];
+        u.ME(n).cvalues{1} = d.glimfile.(predname{n});
+        % Negative contrast
+        u.ME(n).cnames{2} = ['-' predname{n}];
+        u.ME(n).cvalues{2} = -d.glimfile.(predname{n});
     end
+    % Select contrast(s) to run
+    f = figure('Visible', 'off');
+    f = uicontrol('String', 'text', 'Visible', 'off');
+    set(f, 'String', u.ME(n).cnames);
+    dims = get(f, 'Extent');
+    width = dims(3)+50;
+    height = dims(4)+50;
+    [con_select, ~] = listdlg('PromptString', 'Select Contrast','ListString', u.ME(n).cnames, 'ListSize', [width height]);
+    u.ME(n).selected_contrast_names = u.ME(n).cnames(con_select);
+    u.ME(n).selected_contrast_values = u.ME(n).cvalues(con_select);
+    u.ME(n).contrasts = contrasts(u, d, Y, u.ME(n), 'ME', predname{n});
 end
 
 % % Interactions
 n = 1;
 if strcmp(u.interaction, 'yes')
+    % Define contrasts
     for r = 1:size(predvars,2)
         % Two-way
         if size(predvars,2) > r
@@ -148,54 +162,30 @@ if strcmp(u.interaction, 'yes')
                 u.INT(n).predictors = {predname{r}, predname{s}};
                 preds = [predname{r} 'X' predname{s}];
                 u.INT(n).types = {u.ME(r).type, u.ME(s).type};
-                u.INT(n).labels = {u.ME(r).labels, u.ME(s).labels};     
-                if all(strcmp(u.INT(n).types,'continuous'))
-                    u.INT(n).contrasts = contrasts(u, [predname{r} '*' predname{s}], d.glimfile.(predname{r}).*d.glimfile.(predname{s}), 'INT', preds);
-                elseif any(strcmp(u.INT(n).types, 'continuous'))
-                    contidx = strcmp(u.INT(n).types, 'continuous');
-                    catidx = strcmp(u.INT(n).types, 'categorical');
-                    contvars = u.INT(n).predictors{contidx};
-                    catvars = u.INT(n).predictors{catidx};
-                    termvar = term(d.glimfile.(catvars));
-                    catpairs = nchoosek(1:size(u.ME(catidx).labels,1), 2);
-                    catpairs = [catpairs; flip(nchoosek(1:size(u.ME(catidx).labels,1),2),2)];
-                    for q = 1:size(catpairs,1)
-                        cname = [contvars '*' catvars '.' u.ME(catidx).labels{catpairs(q,1)} '-' contvars '*' catvars '.' u.ME(catidx).labels{catpairs(q,2)}];
-                        cvalue = d.glimfile.(contvars).*termvar.(u.ME(catidx).labels{catpairs(q,1)})-d.glimfile.(contvars).*termvar.(u.ME(catidx).labels{catpairs(q,2)});
-                        u.INT(n).contrasts(q) = contrasts(u, cname, cvalue, 'INT', preds);
-                    end
-                elseif all(strcmp(u.INT(n).types,'categorical'))
-                    warning('This code is not set up for two categorical predictor variables. Two-way categorical interactions skipped.')
+                u.INT(n).labels = {u.ME(r).labels, u.ME(s).labels};
+                conpairs = fliplr(combvec(1:size(u.ME(r).selected_contrast_names,2), size(u.ME(s).selected_contrast_names,2))');
+                for t = 1:size(conpairs,1)
+                    u.INT(n).selected_contrast_names{t} = [u.ME(r).selected_contrast_names{conpairs(t,1)} '*' u.ME(s).selected_contrast_names{conpairs(t,2)}];
+                    u.INT(n).selected_contrast_values{t} = u.ME(r).selected_contrast_values{conpairs(t,1)}.*u.ME(s).selected_contrast_values{conpairs(t,2)};
                 end
-                n = n +1;
+                u.INT(n).contrasts = contrasts(u, d, Y, u.INT(n), 'INT', preds);
+                n = n + 1;
             end
         end
     end
     % Three-way
     if size(predvars,2) == 3
-        u.INT(n+1).predictors = {predname{1}, predname{2}, predname{3}};
+        n = n + 1;
+        u.INT(n).predictors = {predname{1}, predname{2}, predname{3}};
         preds = [predname{1} 'X' predname{2} 'X' predname{3}];
-        u.INT(n+1).types = {u.ME(1).type, u.ME(2).type, u.ME(3).type};
-        if all(strcmp(u.INT(n+1).types,'continuous'))
-            cname = [predname{1} '*' predname{2} '*' predname{3}];
-            cvalue = d.glimfile.(predname{1})*d.glimfile.(predname{2})*d.glimfile.(predname{3});
-            u.INT(n+1).contrasts = contrasts(u, cname, cvalue, INT, preds);
-        elseif size(find(strcmp(u.INT(n+1).types,'categorical')),2)==1
-            contidx = find(strcmp(u.INT(n+1).types, 'continuous'));
-            catidx = find(strcmp(u.INT(n+1).types, 'categorical'));
-            contvars = predname(contidx);
-            catvar = predname{catidx};
-            termvar = term(d.glimfile.(catvar));
-            catpairs = nchoosek(1:size(u.ME(catidx).labels,1), 2);
-            catpairs = [catpairs; flip(nchoosek(1:size(u.ME(catidx).labels,1),2),2)];
-            for q = 1:size(catpairs,1)
-                cname = [contvars{1} '*' contvars{2} '*' catvar '.' u.ME(catidx).labels{catpairs(q,1)} '-' contvars{1} '*' contvars{2} '*' catvar '.' u.ME(catidx).labels{catpairs(q,2)}];
-                cvalue = (d.glimfile.(contvars{1}).*d.glimfile.(contvars{2}).*termvar.(u.ME(catidx).labels{catpairs(q,1)}))-(d.glimfile.(contvars{1}).*d.glimfile.(contvars{2}).*termvar.(u.ME(catidx).labels{catpairs(q,2)}));
-                u.INT(n+1).contrasts(q) = contrasts(u, cname, cvalue, 'INT', preds);
-            end
-        elseif size(find(strcmp(u.INT(n+1).types,'categorical')),2)>1
-            warning('This code is not set up for two categorical predictor variables. Three-way interaction skipped.')
+        u.INT(n).types = {u.ME(1).type, u.ME(2).type, u.ME(3).type};
+        u.INT(n).labels = {u.ME(1).labels, u.ME(2).labels, u.ME(3).labels};
+        conpairs = fliplr(combvec(1:size(u.ME(1).selected_contrast_names,2), size(u.ME(2).selected_contrast_names,2),size(u.ME(3).selected_contrast_names,2))');
+        for t = 1:size(conpairs,1)
+            u.INT(n).selected_contrast_names{t} = [u.ME(1).selected_contrast_names{conpairs(t,1)} '*' u.ME(2).selected_contrast_names{conpairs(t,2)} '*' u.ME(3).selected_contrast_names{conpairs(t,3)}];
+            u.INT(n).selected_contrast_values{t} = u.ME(1).selected_contrast_values{conpairs(t,1)}.*u.ME(2).selected_contrast_values{conpairs(t,2)}.*u.ME(3).selected_contrast_values{conpairs(t,2)};
         end
+        u.INT(n).contrasts = contrasts(u, d, Y, u.INT(n), 'INT', preds);
     end
 end
 save(fullfile(u.outdir, ['uniGLM_' strrep(strrep(u.model(5:end),'+', '_'), '*', 'X') '.mat']))
