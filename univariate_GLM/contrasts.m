@@ -47,7 +47,7 @@ for i = 1:size(u.selected_contrast_names,2)
         term(RFT.clus)
         term(RFT.peak) + term(SurfStatInd2Coord(RFT.peak.vertid, uniGLM.avsurf)', {'x','y','z'})   %#ok<NOPRT>
         diary off
-        interaction_table(RFT, uniGLM.avsurf, c(i).name, fullfile(uniGLM.outdir, cdir, ctype));
+        interaction_table(RFT, uniGLM.avsurf, c(i).name, fullfile(uniGLM.outdir, cdir), ctype);
     end
 
     % FDR-corrected
