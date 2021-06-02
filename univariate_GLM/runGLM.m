@@ -163,7 +163,7 @@ if strcmp(u.interaction, 'yes')
                 preds = [predname{r} 'X' predname{s}];
                 u.INT(n).types = {u.ME(r).type, u.ME(s).type};
                 u.INT(n).labels = {u.ME(r).labels, u.ME(s).labels};
-                conpairs = fliplr(combvec(1:size(u.ME(r).selected_contrast_names,2), size(u.ME(s).selected_contrast_names,2))');
+                conpairs = allcomb(1:size(u.ME(r).selected_contrast_names,2), 1:size(u.ME(s).selected_contrast_names,2));
                 for t = 1:size(conpairs,1)
                     u.INT(n).selected_contrast_names{t} = [u.ME(r).selected_contrast_names{conpairs(t,1)} '*' u.ME(s).selected_contrast_names{conpairs(t,2)}];
                     u.INT(n).selected_contrast_values{t} = u.ME(r).selected_contrast_values{conpairs(t,1)}.*u.ME(s).selected_contrast_values{conpairs(t,2)};
@@ -180,7 +180,7 @@ if strcmp(u.interaction, 'yes')
         preds = [predname{1} 'X' predname{2} 'X' predname{3}];
         u.INT(n).types = {u.ME(1).type, u.ME(2).type, u.ME(3).type};
         u.INT(n).labels = {u.ME(1).labels, u.ME(2).labels, u.ME(3).labels};
-        conpairs = fliplr(combvec(1:size(u.ME(1).selected_contrast_names,2), size(u.ME(2).selected_contrast_names,2),size(u.ME(3).selected_contrast_names,2))');
+        conpairs = allcomb(1:size(u.ME(1).selected_contrast_names,2), 1:size(u.ME(2).selected_contrast_names,2),1:size(u.ME(3).selected_contrast_names,2));
         for t = 1:size(conpairs,1)
             u.INT(n).selected_contrast_names{t} = [u.ME(1).selected_contrast_names{conpairs(t,1)} '*' u.ME(2).selected_contrast_names{conpairs(t,2)} '*' u.ME(3).selected_contrast_names{conpairs(t,3)}];
             u.INT(n).selected_contrast_values{t} = u.ME(1).selected_contrast_values{conpairs(t,1)}.*u.ME(2).selected_contrast_values{conpairs(t,2)}.*u.ME(3).selected_contrast_values{conpairs(t,2)};
