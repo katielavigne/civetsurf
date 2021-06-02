@@ -18,6 +18,9 @@ function interaction_table(RFT, avsurf, cname, outdir, ctype)
                 tclus.mni(n,1:3) = SurfStatInd2Coord(verts(k), avsurf)';
                 n = n + 1;
             else
+                if isempty(vlabel)
+                    continue
+                end
                 if strcmp(tclus.region(tclus.cluster==j:end),vlabel)==0
                     tclus.cluster(n,1) = j;
                     tclus.nverts(n,1) = RFT.clus.nverts(j);
@@ -33,6 +36,9 @@ function interaction_table(RFT, avsurf, cname, outdir, ctype)
     verts = RFT.peak.vertid(peak);
     for k = 1:size(verts,1)
         vlabel = info.description(info.label_number==info.ROIverts(verts(k)));
+        if isempty(vlabel)
+            vlabel = {'N/A'};
+        end
         tvert.vertnum(m,1) = verts(k);
         tvert.region(m,1) = vlabel;
         tvert.mni(m,1:3) = SurfStatInd2Coord(verts(k), avsurf)';
@@ -41,7 +47,7 @@ function interaction_table(RFT, avsurf, cname, outdir, ctype)
     
     if exist('tclus', 'var')
         tclus = struct2table(tclus);
-        writetable(tclus, fullfile(outdir,['Cluster Locations ' ctype ' 'cname '.xlsx']))
+        writetable(tclus, fullfile(outdir,['Cluster Locations ' ctype ' ' cname '.xlsx']))
     end
 
     if exist('tvert', 'var')
