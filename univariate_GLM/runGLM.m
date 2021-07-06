@@ -148,7 +148,7 @@ for n = 1:size(predvars,2)
     [con_select, ~] = listdlg('PromptString', 'Select Contrast','ListString', u.ME(n).cnames, 'ListSize', [width height]);
     u.ME(n).selected_contrast_names = u.ME(n).cnames(con_select);
     u.ME(n).selected_contrast_values = u.ME(n).cvalues(con_select);
-    u.ME(n).contrasts = contrasts(u, d, Y, u.ME(n), 'ME', predname{n});
+%     u.ME(n).contrasts = contrasts(u, u.ME(n), 'ME', predname{n});
 end
 
 % % Interactions
@@ -163,12 +163,17 @@ if strcmp(u.interaction, 'yes')
                 preds = [predname{r} 'X' predname{s}];
                 u.INT(n).types = {u.ME(r).type, u.ME(s).type};
                 u.INT(n).labels = {u.ME(r).labels, u.ME(s).labels};
-                conpairs = allcomb(1:size(u.ME(r).selected_contrast_names,2), 1:size(u.ME(s).selected_contrast_names,2));
-                for t = 1:size(conpairs,1)
-                    u.INT(n).selected_contrast_names{t} = [u.ME(r).selected_contrast_names{conpairs(t,1)} '*' u.ME(s).selected_contrast_names{conpairs(t,2)}];
-                    u.INT(n).selected_contrast_values{t} = u.ME(r).selected_contrast_values{conpairs(t,1)}.*u.ME(s).selected_contrast_values{conpairs(t,2)};
+            switch u.ME(s).type
+                case 'categorical'
+                    for t = 1:size(u.ME(s).selected_contrast_names,2)
+                        u.INT(n).selected_contrast_names{t} = [predname{r} '*' u.ME(s).selected_contrast_names{t}];
+                        u.INT(n).selected_contrast_values{t} = u.ME(r).cvalues{1}.*u.ME(s).cvalues{1};
+                    end
+                case 'continuous'
+                    u.INT(n).selected_contrast_names = {[predname{r} '*' predname{s}],[predname{r} '*-' predname{s}]};
+                    u.INT(n).selected_contrast_values = {u.ME(r).cvalues{1}.*u.ME(s).cvalues{1},u.ME(r).cvalues{1}.*u.ME(s).cvalues{2}};
                 end
-                u.INT(n).contrasts = contrasts(u, d, Y, u.INT(n), 'INT', preds);
+                u.INT(n).contrasts = contrasts(u, u.INT(n), 'INT', preds);
                 n = n + 1;
             end
         end
@@ -180,12 +185,22 @@ if strcmp(u.interaction, 'yes')
         preds = [predname{1} 'X' predname{2} 'X' predname{3}];
         u.INT(n).types = {u.ME(1).type, u.ME(2).type, u.ME(3).type};
         u.INT(n).labels = {u.ME(1).labels, u.ME(2).labels, u.ME(3).labels};
-        conpairs = allcomb(1:size(u.ME(1).selected_contrast_names,2), 1:size(u.ME(2).selected_contrast_names,2),1:size(u.ME(3).selected_contrast_names,2));
-        for t = 1:size(conpairs,1)
-            u.INT(n).selected_contrast_names{t} = [u.ME(1).selected_contrast_names{conpairs(t,1)} '*' u.ME(2).selected_contrast_names{conpairs(t,2)} '*' u.ME(3).selected_contrast_names{conpairs(t,3)}];
+        catvars = find(strcmp(u.INT(n).types, 'categorical'));
+        contvars = find(strcmp(u.INT(n).types, 'continuous'));
+        contnames
+        for t = 1:size(predvars,2)
+            if strcmp(u.ME(t).type,'categorical')
+                
+        
+        
+        
+        for t = 1:size(predvars,2)
+            if catvars(t) == 1
+                cname = u.ME(t).
+                u.INT(n).selected_contrast_names{t} = [u.ME(1).selected_contrast_names{conpairs(t,1)} '*' u.ME(2).selected_contrast_names{conpairs(t,2)} '*' u.ME(3).selected_contrast_names{conpairs(t,3)}];
             u.INT(n).selected_contrast_values{t} = u.ME(1).selected_contrast_values{conpairs(t,1)}.*u.ME(2).selected_contrast_values{conpairs(t,2)}.*u.ME(3).selected_contrast_values{conpairs(t,2)};
         end
-        u.INT(n).contrasts = contrasts(u, d, Y, u.INT(n), 'INT', preds);
+        u.INT(n).contrasts = contrasts(u, u.INT(n), 'INT', preds);
     end
 end
 save(fullfile(u.outdir, ['uniGLM_' strrep(strrep(u.model(5:end),'+', '_'), '*', 'X') '.mat']))

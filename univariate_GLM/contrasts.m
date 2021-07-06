@@ -1,4 +1,4 @@
-function c = contrasts(uniGLM, d, Y, u, ctype, predname)
+function c = contrasts(uniGLM, u, ctype, predname)
 % CONTRASTS Compare GLM contrasts based on user-defined general linear model.
 
 cdir = [ctype '_' predname];

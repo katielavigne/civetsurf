@@ -47,12 +47,12 @@ function interaction_table(RFT, avsurf, cname, outdir, ctype)
     
     if exist('tclus', 'var')
         tclus = struct2table(tclus);
-        writetable(tclus, fullfile(outdir,['Cluster Locations ' ctype ' ' cname '.xlsx']))
+        writetable(tclus, fullfile(outdir,['Cluster Locations ' ctype ' ' cname '.csv']))
     end
 
     if exist('tvert', 'var')
         tvert = struct2table(tvert);
-        writetable(tvert, fullfile(outdir,['Vertex Locations ' ctype ' ' cname '.xlsx']))
+        writetable(tvert, fullfile(outdir,['Vertex Locations ' ctype ' ' cname '.csv']))
     end
 
 end
