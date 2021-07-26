@@ -59,8 +59,9 @@ end
 
 % Remove missing subjects from glimfile
 if ~isempty(missing)
+    rows = zeros(size(missing,1),1);
     for i = 1:size(missing,1)
-        row = find(strcmp(data.glimfile.(data.id_variable),missing{i}));
-        newglimfile(row,:) = []; %#ok<FNDSB>
+        rows(i,1) = find(strcmp(data.glimfile.(data.id_variable),missing{i}));
     end
+    newglimfile(rows,:) = [];
 end
