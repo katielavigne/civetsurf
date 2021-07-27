@@ -18,8 +18,9 @@ if isfield(sc, 'groups')
         for grsubj = 1:size(sc.groups(gr).glimfile,1)
             LOO = sc.groups(gr).data;
             LOO(grsubj,:) = [];
+            n_gr = size(LOO,1);
             corrLOO = corrcoef(LOO);
-            W = corrmtrix-corrLOO;
+            W = (n_gr*corrmtrix)-((n_gr-1)*corrLOO);
             tmp = W - min(W(:));
             if gr == 1
                 normW(:,:,grsubj) = tmp./max(tmp(:));
