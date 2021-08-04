@@ -1,15 +1,26 @@
 %% Demo script for civetsurf - PLS
 % Author: Katie Lavigne
-
-%% Data Preparation (required as initial setup)
+%
+% Data Preparation (required as initial setup)
 % Prepare CIVET-processed structural MRI data & glimfile for analysis.
+%
+% PREREQUISITES: dataprep, parcellate
+%   - dataprep: data setup
+%   - parcellate: region-based parcellation of vertices; required for
+%   outputs even if running vertex-based PLS
+%
+% OPTIONAL: addglimvars, ssregress
+%   - addglimvars: add variables from glimfile to imaging data (e.g.,
+%   hippocampal volume)
+%   - ssregress: regress out potential confounding variables and perform
+%   PLS on residuals
 
 help dataprep % view instructions for this step
 
 data = dataprep(); % create data structure
 save civetsurf_data.mat % save output
 
-%% Parcellation (optional, order with other optional sections varies by study)
+%% Parcellation
 % Create parcellation for vertex data.
 
 help parcellate % view instructions for this step
@@ -17,23 +28,23 @@ help parcellate % view instructions for this step
 [data.parc] = parcellate(data.Y.smooth20mm, data.avsurf, data.mask, 'dkt', pwd); % parcellate
 save civetsurf_parc.mat data % save output
 
-%% Add Variables (optional, order with other optional sections varies by study)
-% Append variables to data matrix.
+    %% (optional) Add Variables
+    % Append variables to data matrix.
 
-help addglimvars % view instructions for this step
+    help addglimvars % view instructions for this step
 
-data.gfields % list possible variables to add
-vars = {'var1'; 'var2'}; % define variables to add using variable names from data.gfields
-data = addglimvars(data.parc.ROIs, data.parc.pinfo, data.glimfile, vars, 'Hippo'); % add variables to parcellated data
+    data.gfields % list possible variables to add
+    vars = {'var1'; 'var2'}; % define variables to add using variable names from data.gfields
+    data = addglimvars(data.parc.ROIs, data.parc.pinfo, data.glimfile, vars, 'Hippo'); % add variables to parcellated data
 
-%% Regress Out Covariates (optional, order with other optional sections varies by study)
-% Regress covariates out of data.
+    %% (optional) Regress Out Covariates 
+    % Regress covariates out of data.
 
-help ssregress % view instructions for this step
+    help ssregress % view instructions for this step
 
-covars = {'meanCorticalMeasure20mm'}; % define covariates using variables from data.gfields
-[data.residmodel, ~, ~, data.resid] = ssregress(data.ROIs_Hippo, data.glimfile, covars); % regress out covariates
-save civetsurf_resid.mat data % save output
+    covars = {'meanCorticalMeasure20mm'}; % define covariates using variables from data.gfields
+    [data.residmodel, ~, ~, data.resid] = ssregress(data.ROIs_Hippo, data.glimfile, covars); % regress out covariates
+    save civetsurf_resid.mat data % save output
 
 %% Partial Least Squares
 % Run partial least squares behaviour analysis.
@@ -44,7 +55,11 @@ help pls % view instructions for this step
 behvars = {'var1', 'var2' 'var3', 'var4'};
 behdesc = {'var1name', 'var2name', 'var3name', 'var4name'};
 
-PLS = pls(data.resid, data.parc.pinfo, data.avsurf, data.glimfile, behvars, behdesc); % run pls
+    % (optional)Group PLS
+    data.group = categorical(data.glimfile.Group);
+    data.gnames = categories(data.group);
+
+PLS = pls(data.resid, data, behvars, behdesc); % run pls
 save(fullfile('pls', 'civetsurf_pls.mat')) % save results output
 close all
 
@@ -58,11 +73,11 @@ prevPLS = PLS;
 clear PLS
 newdata = dataprep(); % create new data structure
 
-% OPTIONAL (should be same processing as previous pls analysis)
-[newdata.parc] = parcellate(newdata.Y.smooth20mm, newdata.avsurf, newdata.mask, 'dkt', pwd); % parcellate
-covars = {'meanCorticalMeasure20mm'}; % define covariates using variables from data.gfields
-[newdata.residmodel, ~, ~, newdata.resid] = ssregress(newdata.parc.ROIs, newdata.glimfile, covars); % regress out covariates
-% OPTIONAL END
+    % OPTIONAL (should be same processing as previous pls analysis)
+    [newdata.parc] = parcellate(newdata.Y.smooth20mm, newdata.avsurf, newdata.mask, 'dkt', pwd); % parcellate
+    covars = {'meanCorticalMeasure20mm'}; % define covariates using variables from data.gfields
+    [newdata.residmodel, ~, ~, newdata.resid] = ssregress(newdata.parc.ROIs, newdata.glimfile, covars); % regress out covariates
+    % OPTIONAL END
 
 PLSrepl = plsrepl(newdata, prevPLS, behvars, behdesc, 1); % run pls replication projecting to LV1
 save(fullfile('PLSreplication', 'civetsurf_plsrepl.mat')) % save results output

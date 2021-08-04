@@ -12,7 +12,8 @@ else
 end
 
 % Bootstrap Ratios
-figure;
+f = figure;
+movegui(f, 'center')
 [a, cb] = SurfStatView(output, avsurf, figlabel);
 cb.Limits = [round(cb.Limits(1)) round(cb.Limits(2))];
 set(gca, 'FontSize', 14, 'FontName', 'Times')
