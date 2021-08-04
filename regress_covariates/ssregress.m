@@ -5,7 +5,7 @@ function [model, X, coef, Yresid] = ssregress(Y, glimfile, predvars)
 % description:      regresses out nuisance variables from data
 % external funcs:   surfstat (http://www.math.mcgill.ca/keith/surfstat/)
 % function:         regress_covariates/ssregress.m
-% function input:   ROI or vertex data (data.SCdata or data.parc.ROIs), glimfile, covariate names (from data.gfields)
+% function input:   vertex or ROI data (e.g., data.Y.smooth20mm, data.parc.ROIs), glimfile, covariate names (from data.gfields)
 % online input:     none
 %
 % output: adds two fields to data structure

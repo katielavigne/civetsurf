@@ -6,7 +6,9 @@ function p = pls(X, data, behvars, behdesc)
 %                   (https://github.com/CoBrALab/documentation/wiki/Running-PLS-in-MATLAB-with-cross-sectional-data)
 % external funcs:   plsmd, surfstat (http://www.math.mcgill.ca/keith/surfstat/)
 % function:         partial_least_squares/pls.m
-% function input:   data (ROI or vertex), parcellation info, average surface, glimfile, behavioural data names and descriptions
+% function input:   data (ROI or vertex), data structure (from dataprep), behavioural data names and descriptions
+%
+% NOTE: Group PLS requires imaging data in stacked cell arrays (see demo_pls.m)
 %
 % output: 
 %       (1) pls folder with results

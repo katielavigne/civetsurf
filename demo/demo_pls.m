@@ -4,23 +4,26 @@
 % Data Preparation (required as initial setup)
 % Prepare CIVET-processed structural MRI data & glimfile for analysis.
 %
-% PREREQUISITES: dataprep, parcellate
+% PREREQUISITE STEPS: dataprep, parcellate
 %   - dataprep: data setup
 %   - parcellate: region-based parcellation of vertices; required for
 %   outputs even if running vertex-based PLS
 %
-% OPTIONAL: addglimvars, ssregress
+% OPTIONAL STEPS: addglimvars, ssregress
 %   - addglimvars: add variables from glimfile to imaging data (e.g.,
 %   hippocampal volume)
 %   - ssregress: regress out potential confounding variables and perform
 %   PLS on residuals
+
+%% Data Preparation (required as initial setup)
+% Prepare CIVET-processed structural MRI data & glimfile for analysis.
 
 help dataprep % view instructions for this step
 
 data = dataprep(); % create data structure
 save civetsurf_data.mat % save output
 
-%% Parcellation
+%% Parcellation (required for PLS outputs)
 % Create parcellation for vertex data.
 
 help parcellate % view instructions for this step
@@ -54,14 +57,18 @@ help pls % view instructions for this step
 % Define behavioural variables (behvars) and descriptions for plotting (behdesc) using variable names from data.gfields
 behvars = {'var1', 'var2' 'var3', 'var4'};
 behdesc = {'var1name', 'var2name', 'var3name', 'var4name'};
-
-    % (optional)Group PLS
-    data.group = categorical(data.glimfile.Group);
-    data.gnames = categories(data.group);
-
 PLS = pls(data.resid, data, behvars, behdesc); % run pls
 save(fullfile('pls', 'civetsurf_pls.mat')) % save results output
-close all
+
+    % (optional) Group PLS - requires stacked cell array imaging data
+    data.group = categorical(data.glimfile.Group); % assumes Group is name of grouping variable
+    data.gnames = categories(data.group);
+    for g = 1:size(data.gnames,1)
+        rows = data.group==data.gnames{g};
+        data.stacked_data{g,1} = data.resid(rows,:);
+    end
+    PLS = pls(data.stacked_data, data, behvars, behdesc); % run group pls
+    save(fullfile('pls', 'civetsurf_group_pls.mat')) % save results output
 
 %% PLS Replication
 % Apply previous PLS model to new dataset.
