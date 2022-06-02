@@ -21,13 +21,8 @@ if isfield(sc, 'groups')
             n_gr = size(LOO,1);
             corrLOO = corrcoef(LOO);
             W = (n_gr*corrmtrix)-((n_gr-1)*corrLOO);
-            tmp = W - min(W(:));
-            if gr == 1
-                normW(:,:,grsubj) = tmp./max(tmp(:));
-            else
-                normW(:,:,grsubj+size(sc.groups(1).data,1)) = tmp./max(tmp(:));
-            end
-            normW(1:size(normW,1)+1:end) = 1;
+            % Absolute value
+            normW = abs(W);
         end
     end
 else
@@ -37,9 +32,6 @@ else
         LOO(subj,:) = [];
         corrLOO = corrcoef(LOO);
         W = (n*corrmtrix)-((n-1)*corrLOO);
-        % Normalize between 0 and 1
-        tmp = W - min(W(:));
-        normW(:,:,subj) = tmp./max(tmp(:));
-        normW(1:size(normW,1)+1:end) = 1;
+        normW = abs(W);
     end
 end

@@ -62,7 +62,7 @@ if isfield(result.boot_result, 'ulcorr')
     for j = 1:size(bardata,1)
         if lower(j) ~= 0 % skip blanks
             if sign(bardata(j) + upper(j)) == sign(bardata(j) - lower(j))
-                b.CData(j,:) = barcolours(grouprep(k),:);
+                b.CData(j,:) = [0.5,0.5,1];
             else
                 b.CData(j,:) = [.8, .8, .8];
             end % if significant
