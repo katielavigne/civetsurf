@@ -22,7 +22,7 @@ if isfield(sc, 'groups')
             corrLOO = corrcoef(LOO);
             W = (n_gr*corrmtrix)-((n_gr-1)*corrLOO);
             % Absolute value
-            normW = abs(W);
+            normW(:,:,grsubj) = abs(W);
         end
     end
 else
@@ -32,6 +32,6 @@ else
         LOO(subj,:) = [];
         corrLOO = corrcoef(LOO);
         W = (n*corrmtrix)-((n-1)*corrLOO);
-        normW = abs(W);
+        normW(:,:,grsubj) = abs(W);
     end
 end
