@@ -13,6 +13,7 @@ function [normW] = jackknife_bias_est(sc)
 n = size(sc.data,1);
 normW = zeros(size(sc.data,2),size(sc.data,2),n);
 if isfield(sc, 'groups')
+    x = 0;
     for gr = 1:size(sc.groups,2)
         corrmtrix = sc.groups(gr).C;
         for grsubj = 1:size(sc.groups(gr).glimfile,1)
@@ -22,8 +23,9 @@ if isfield(sc, 'groups')
             corrLOO = corrcoef(LOO);
             W = (n_gr*corrmtrix)-((n_gr-1)*corrLOO);
             % Absolute value
-            normW = abs(W);
+            normW(:,:,grsubj+x) = abs(W);
         end
+        x = grsubj;
     end
 else
     corrmtrix = sc.C;
@@ -32,6 +34,6 @@ else
         LOO(subj,:) = [];
         corrLOO = corrcoef(LOO);
         W = (n*corrmtrix)-((n-1)*corrLOO);
-        normW = abs(W);
+        normW(:,:,subj) = abs(W);
     end
 end
